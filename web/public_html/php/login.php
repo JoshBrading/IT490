@@ -4,9 +4,8 @@ require_once('../../path.inc');
 require_once('../../get_host_info.inc');
 require_once('../../rabbitMQLib.inc');
 
-//login();
-
 //Login
+
 function login($username, $password){
 	$client = new rabbitMQClient("../testRabbitMQ.ini","testServer");
     $request = array();
@@ -29,6 +28,7 @@ function login($username, $password){
 }
 
 //Logout
+
 function logout(){
     if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
@@ -59,6 +59,7 @@ function new_user($username, $password){
 	}
 }
 
+//Handles login requests
 if (!isset($_POST))
 {
 	$msg = "NO POST MESSAGE SET, POLITELY FUCK OFF";
@@ -66,7 +67,7 @@ if (!isset($_POST))
 	exit(0);
 }
 $request = $_POST;
-//echo $request["type"];
+
 $response = "unsupported request type, politely FUCK OFF";
 switch ($request["type"])
 {

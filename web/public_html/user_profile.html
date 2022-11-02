@@ -2,13 +2,20 @@
 <html lang="en">
 
 <script>
+    //Functions
     
     //Handles all user requests and passes them as a string type to user_request.php
-    function get_user_request()
+    function get_user_data(data_type)
     {
         var request = new XMLHttpRequest();
         request.open("POST","php/user_request.php",true);
         request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+
+        //This bullshit is so we can concat the userid to the request
+        const queryString = window.location.search; 
+        const urlParams = new URLSearchParams(queryString);
+        const userid = urlParams.get('userid')
+        console.log(userid);
 
         request.onreadystatechange = function ()
         {
@@ -16,9 +23,10 @@
             if ((this.readyState == 4)&&(this.status == 200))
             {
                 replace_html("username", this.responseText);
+                return this.responseText;
             }
         }
-        request.send("type=profile_name");
+        request.send("type=",data_type,"&userid=",userid);
     }
 
     //Replaces HTML Text with text sent in replace_text parameter
@@ -27,21 +35,17 @@
         document.getElementById(id).innerHTML = replace_text;
     }
 
-    //Replaces HTML Text with a list
-    function list_html(id)
+    //Populate a list marked by an id
+    function list_html(id, data_array)
     {
-
-        let test_friends = ["Star", "Angie", "Brush"]
-        
-
+        var list = document.getElementById(id);
+        for (var i = 0; i < data_array.length; i++)
+        {
+            var li = document.createElement("li");
+            li.appendChild(document.createTextNode(data_array[i]));
+            list.appendChild(li);
+        }
     }
-
-</script>
-
-<script>
-
-    get_user_request()
-    list_html("friends-list")
 
 </script>
 
@@ -57,9 +61,9 @@
 
         <nav>
 
-            <a href="">Home</a> | 
-            <a href="">Profile</a> | 
-            <a href="">Settings</a>
+            <a href="lobby_home.html">Home</a> | 
+            <a href="user_profile.html">Profile</a> | 
+            <a href="user_settings.html">Settings</a>
 
         </nav>
 
@@ -75,7 +79,7 @@
     
         <h2>Friends</h2>
 
-        <ul id="friends-list"></ul>
+        <ul id="friends_list"></ul>
 
     </main>
 
@@ -86,3 +90,20 @@
 </body>
 
 </html>
+
+<script>
+    //Function Calls
+
+    var profile_info = get_user_data("all")
+    console.log(profile_info)
+
+    var friends = get_user_data("friends")
+    console.log(friends)
+
+    var achievements = get_user_data("achievements")
+    console.log(achievements)
+
+    list_html("friends_list", friends)
+    list_html("achievements", achievements)
+
+</script>
