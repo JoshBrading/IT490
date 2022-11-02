@@ -4,6 +4,44 @@
 <script>
     //Functions
 
+    function join_lobby_req()
+    {
+        lobbyid = document.getElementById("lobbyid").value;
+
+
+        var request = new XMLHttpRequest();
+        request.open("POST","/php/lobby_request.php",true);
+        request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+
+        request.onreadystatechange= function ()
+        {
+            
+            if ((this.readyState == 4)&&(this.status == 200))
+            {
+                console.log(this.responseText);
+                HandleLoginResponse(this.responseText);
+            }		
+        }
+        request.send("type=join&lobbyid="+lobbyid);
+    }
+
+    function create_lobby_req(){
+        var request = new XMLHttpRequest();
+        request.open("POST","/php/lobby_request.php",true);
+        request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+
+        request.onreadystatechange= function ()
+        {
+            
+            if ((this.readyState == 4)&&(this.status == 200))
+            {
+                console.log(this.responseText);
+                HandleLoginResponse(this.responseText);
+            }		
+        }
+        request.send("type=create");
+    }
+
 </script>
 
 <head>
@@ -28,7 +66,18 @@
 
     <main>
 
+        <!--Lobby Request-->
+        <form action="javascript:join_lobby_req()">
+            <label for="lobbyid">Lobby ID:</label><br>
+            <input type="text" id="lobbyid" name="lobbyid"><br>
+            <input type="submit" value="Join Lobby">
+        </form>
 
+        <h3>Or</h3>
+
+        <form action="javascript:create_lobby_req()">
+            <input type="submit" value="Create Lobby">
+        </form>
 
     </main>
 

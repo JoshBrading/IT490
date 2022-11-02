@@ -45,7 +45,12 @@ function login($username, $password){
 	//Session Exists? Send to lobby_home.html
 	if($response){
 
-		$_SESSION['username'] = $username;
+		$_SESSION['username'] = 'username';
+
+		$request['type'] = 'get_account_id';
+		
+		$response = $client->send_request($request);
+		$_SESSION['userid'] = $response;
 		header("Location: lobby_home.html");
 
 	} 
