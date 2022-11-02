@@ -4,31 +4,58 @@ require_once('../../path.inc');
 require_once('../../get_host_info.inc');
 require_once('../../rabbitMQLib.inc');
 
-//Login
+//Session Check/Creation
+if (isset($_SESSION['username'])){
 
+	if (!session_validate()){
+		session_destroy();
+		header("Location: index.html");
+		exit();
+	}
+}
+else 
+{
+
+	session_start();
+	$id = session_id();
+
+}
+
+//Session Validate
+function session_validate(){
+	
+	$client = new rabbitMQClient("../testRabbitMQ.ini","testserver");
+	$request = array();
+	$request['type'] = "session_validate";
+	$request['session_id'] = session_id();
+	$response = $client->send_request($request);
+	return $response;
+
+}
+
+//Login
 function login($username, $password){
 	$client = new rabbitMQClient("../testRabbitMQ.ini","testServer");
     $request = array();
     $request['type'] ='login';
     $request['username'] = $username;
     $request['password'] = password_hash($password, PASSWORD_DEFAULT);
-    $request['message'] = "t";
     $response = $client->send_request($request);
+
+	//Session Exists? Send to lobby_home.html
 	if($response){
-		session_start();
-	//	return "Auth:";
-		$_SESSION['valid'] = true;
-		$id = session_id();
+
 		$_SESSION['username'] = $username;
-		if( $_SESSION['valid']){
-			return "Authenticated, session created. ID: $id";
-		}
+		header("Location: lobby_home.html");
+
+	} 
+	else 
+	{
+		return "Username or password does not exist.";
 	}
-	return "Username or password does not exist.";
 }
 
 //Logout
-
 function logout(){
     if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
