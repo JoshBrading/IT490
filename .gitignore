@@ -1,2 +1,4 @@
 *.ini
 *.zip
+API/venv/
+*/config.py

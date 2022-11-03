@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+        <!--This HTML works!-->
+
+        <div class="chatapp">
+            <div class="screen join-screen active">
+                <div class="join">
+                    <h2>Join Chat Room</h2>
+                    <div class="join-input">
+                        <label>Enter Username</label>
+                        <input type="text" id="username">
+                    </div>
+                    <div class="join-input">
+                        <button id="join-user">Join</button>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="screen chat-screen">
+
+               <div class="header">
+                   <div class="logo">Chat Room</div>
+                   <button id="exit-room">Leave Chat</button>
+               </div>
+               <div class="msgs">
+                    <!--Testing Message-->
+                   <!--<div class="msg user-msg">
+                       <div>
+                           <div class="user-name">You</div>
+                           <div class="text">Hi</div>
+                       </div>
+                   </div>
+
+                   <div class="update">
+                       Test joined conversation
+                   </div>
+
+                   <div class="msg other-msg">
+                       <div>
+                           <div class="user-name">Test</div>
+                           <div class="text">Hi</div>
+                       </div>
+                   </div>-->
+               </div> 
+               <div class="textBox">
+                   <input type="text" id="msg-enter">
+                   <button id="send-msg">Send</button>
+               </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="script.js"></script>
+    </body>
+</html>
