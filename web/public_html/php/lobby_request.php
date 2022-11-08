@@ -1,59 +1,59 @@
 <?php
+session_start();
 
-    function get_dir(){
+// error_reporting(E_ALL);
+// ini_set("display_errors", 1);
 
-        //https://www.positioniseverything.net/php-header-location/
+require_once('../../path.inc');
+require_once('../../get_host_info.inc');
+require_once('../../rabbitMQLib.inc');
 
-        // getting hostname
-        $hostname = $_SERVER[“HTTP_HOST”];
-        // getting the current directory preceded by a forward “/” slash
-        $current_directory = rtrim(dirname($_SERVER[‘PHP_SELF’]));
-        return $current_directory;
-    }
+function create_room(){
+    $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+    $request = array();
+    $request['type'] = 'lobby_add';
+    
+    $response = json_decode($client->send_request($request));
+    
+    $_SESSION['lobby_host'] = true;
+    $_SESSION['lobby_id'] = $response->{"lobby_id"};
+    return $_SESSION['lobby_id'];
+}
 
-    function create_room(){
-        $client = new rabbitMQClient("../testRabbitMQ.ini","testserver");
-        $request = array();
-        $request['type'] = 'lobby_add';
-        $_SESSION['lobby_host'] = true;
-        $_SESSION['lobby_id'] = rand(0000,9999);
-        return $client->send_request($request);
-    }
+function join_room($lobbyid){
+    $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+    $request = array();
+    $_SESSION['lobby_host'] = false;
+    $_SESSION['lobby_id'] = $lobbyid;
+    return $client->send_request($request);
+}
 
-    function join_room($lobbyid){
-        $client = new rabbitMQClient("../testRabbitMQ.ini","testserver");
-        $request = array();
-        $_SESSION['lobby_host'] = false;
-        header("Location: http://"+get_dir()+"/lobby_game.html");
-        return $client->send_request($request);
-    }
+function list_rooms(){
+    $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+    $request = array();
+    $request['type'] = "get_lobbies";
+    return $client->send_request($request);
+}
 
-    function list_rooms(){
-        $client = new rabbitMQClient("../testRabbitMQ.ini","testserver");
-        $request = array();
-        $request['type'] = "get_lobbies";
-        return $client->send_request($request);
-    }
+$request = $_POST;
 
-   $request = $_POST;
+//Switch statement handles all user requests from here
 
-   //Switch statement handles all user requests from here
+switch ($request["type"]){
 
-   switch ($request["type"]){
+    case "create":
+        $response = create_room();
+        break;
 
-        case "create":
-            $response = create_room();
-            break;
+    case "join":
+        $response = join_room($request["lobbyid"]);
+        break;
 
-        case "join":
-            $response = join_room($request["lobbyid"]);
-            break;
+    case "list":
+        $response = list_rooms();
+}
 
-        case "list":
-            $response = list_rooms();
-   }
-
-   echo json_encode($response);
-   exit(0);
+echo $response;
+exit(0);
 
 ?>

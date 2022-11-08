@@ -12,7 +12,7 @@ function SendLoginRequest()
 	password = document.getElementById("password").value;
 
 	var request = new XMLHttpRequest();
-	request.open("POST","/php/login.php",true);
+	request.open("POST","php/login.php",true);
 	request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 
 	request.onreadystatechange= function ()
@@ -21,7 +21,12 @@ function SendLoginRequest()
 		if ((this.readyState == 4)&&(this.status == 200))
 		{
 			console.log(this.responseText);
-			HandleLoginResponse(this.responseText);
+			if(this.responseText != "Fail")
+			{
+				localStorage.setItem("username", username);
+				localStorage.setItem("user_id", this.responseText);
+				window.location.replace("lobby_home.html");
+			}
 		}		
 	}
 	request.send("type=login&uname="+username+"&password="+password);
@@ -30,7 +35,7 @@ function SendLoginRequest()
 function SendLogoutRequest()
 {
 	var request = new XMLHttpRequest();
-	request.open("POST", "/php/login.php", true);
+	request.open("POST", "php/login.php", true);
 	request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
 	request.onreadystatechange = function()

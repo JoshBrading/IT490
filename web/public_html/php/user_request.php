@@ -26,7 +26,7 @@
       $request['type'] = "get_user_data";
       $request['user_id'] = $userid;
 
-      $response = $client ->send_request($request);
+      $response = $client->send_request($request);
       return $response;
    }
 
@@ -42,17 +42,19 @@
 
    }
    
-   function friend_request($username, $friend_name)
+   function friend_request($user_id, $friend_name)
    {
 
       $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
       $request = array();
       $request['type'] = "add_friend";
-      $request['username'] = $username;
-      $request['friendUsername'] = $friend_name;
+      $request['user_id'] = $user_id;
+      $request['friend_name'] = $friend_name;
 
-      $response = $client ->send_request($request);
-      return $response;
+      $response = $client->send_request($request);
+      $response = json_decode($response);
+      //echo $response;
+      return $response->{'status'};
 
    }
    
@@ -61,7 +63,7 @@
 
       $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
       $request = array();
-      $request['type'] = "get_friends_list";
+      $request['type'] = "get_friends";
       $request['user_id'] = $userid;
 
       $response = $client ->send_request($request);
@@ -122,7 +124,7 @@
    }
 
    $request = $_POST;
-
+   $response = "Unsupported type";
    //Switch statement handles all user requests from here
 
    switch ($request["type"]){
@@ -140,7 +142,7 @@
          break;
 
       case "friend_req":
-         $response = friend_request($request["username"], $request["friend_name"]);
+         $response = friend_request($request["user_id"], $request["friend_name"]);
          break;
 
       case "achievements":

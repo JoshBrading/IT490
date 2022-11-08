@@ -71,6 +71,10 @@ function button_think( self )
             if( self.label.text == solution_name){
                 correct = true;
             }
+            else if( self.label.text == "START")
+            {
+                start_game = true;
+            }
             else{
                 console.log(self.label.text);
                 console.log(solution_name);

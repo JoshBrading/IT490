@@ -4,12 +4,18 @@ ini_set('display_errors', 1);
 
 session_start();
 
-echo `whoami`;
-
 if(!isset($_POST)) exit(0);
-//$text = $_POST['text'];
 
 $dir = 'game_servers/';
+
+if(isset($_POST['type']))
+{
+    $line = shell_exec('tail -n 1 '.escapeshellarg($dir . $_SESSION["lobby_id"] . '.txt'));
+    echo $line;
+    exit(0);
+}
+
+
 
 // create new directory with 744 permissions if it does not exist yet
 if ( !file_exists($dir) ) {
@@ -24,7 +30,7 @@ foreach ($_POST as $key => $value)
 }
 
 $text = $text.PHP_EOL;
-$room = "/" . $_SESSION["lobby_id"] . ".txt";
+$room = "/" . $_POST['lobby_id'] . ".txt";
 
 file_put_contents ($dir.$room, $text, FILE_APPEND);
 

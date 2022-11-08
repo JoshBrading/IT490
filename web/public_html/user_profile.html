@@ -14,7 +14,13 @@
         //This bullshit is so we can concat the userid to the request
         const queryString = window.location.search; 
         const urlParams = new URLSearchParams(queryString);
-        const userid = urlParams.get('user_id');
+        var userid = localStorage.getItem("user_id");
+        
+        //window.history.pushState("","", '/profile/' + localStorage.getItem('username'));
+
+        if(urlParams.get('user_id')){
+            userid = urlParams.get('user_id');
+        }
 
         request.onreadystatechange = function ()
         {
@@ -22,6 +28,7 @@
             if ((this.readyState == 4)&&(this.status == 200))
             {
                 sessionStorage.setItem(data_type, this.responseText);
+                console.log(this.responseText);
                 //replace_html("username", this.responseText);
                 return this.responseText;
             }
@@ -32,11 +39,11 @@
     //Sending a friend request
     function send_friend_req(){
 
-        username = get_user_data("username");
+        user_id = localStorage.getItem("user_id");
         friend_request = document.getElementById("friend_name").value;
 
         var request = new XMLHttpRequest();
-        request.open("POST","/php/user_request.php",true);
+        request.open("POST","php/user_request.php",true);
         request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 
         request.onreadystatechange= function ()
@@ -44,11 +51,12 @@
             
             if ((this.readyState == 4)&&(this.status == 200))
             {
-                console.log(this.responseText);
-                HandleLoginResponse(this.responseText);
+                if(this.responseText == "success"){
+                    console.log("Friend added!");
+                }
             }		
         }
-        request.send("type=friend_req&username="+username+"&friend_name="+friend_request);
+        request.send("type=friend_req&user_id="+user_id+"&friend_name="+friend_request);
 
     }
 
@@ -61,6 +69,21 @@
     //Populate a list marked by an id
     function list_html(id, data_array)
     {
+        if(id == "friends_list"){
+            var list = document.getElementById(id);
+            console.log(typeof(data_array));
+            for (var i = 0; i < data_array.length; i++)
+            {
+                var li = document.createElement("li");
+                var element = document.createElement("a");
+                element.appendChild(document.createTextNode(data_array[i]["username"]));
+                element.setAttribute("href", "user_profile.html?user_id=" + data_array[i]["user_id"]);
+                li.appendChild(element);
+                list.appendChild(li);
+            }
+            return;
+        }
+
         var list = document.getElementById(id);
         console.log(typeof(data_array));
         for (var i = 0; i < data_array.length; i++)
@@ -103,7 +126,7 @@
         <ul id="achievements"></ul>
     
         <h2>Friends</h2>
-
+        <ul id="friends_list"></ul>
         <!--Friend Requests-->
         <form action="javascript:send_friend_req()">
             <label for="friend_name">Username:</label><br>
@@ -111,7 +134,7 @@
             <input type="submit" value="Send Friend Request">
         </form>
 
-        <ul id="friends_list"></ul>
+
 
     </main>
 
@@ -127,13 +150,15 @@
     //Function Calls
 
     var profile_info = get_user_data("all");
-    profile_info = sessionStorage.getItem("all");
+    profile_info = JSON.parse(sessionStorage.getItem("all"));
 
-    var friends = get_user_data("friends");
-    friends = sessionStorage.getItem("friends");
+    replace_html("username", profile_info["name"]);
+
+    var friends = get_user_data("friends_list");
+    friends = JSON.parse(sessionStorage.getItem("friends_list"));
 
     var achievements = get_user_data("achievements");
-    achievements = sessionStorage.getItem("achievements");
+    achievements = JSON.parse(sessionStorage.getItem("achievements"));
 
     console.log(profile_info);
     console.log(friends);
