@@ -1,1 +1,3 @@
 *.ini
+API/venv/
+*/config.py
