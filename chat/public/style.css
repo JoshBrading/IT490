@@ -1,0 +1,184 @@
+*{
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+}
+
+body{
+	font-family: cursive;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.chatapp{
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	max-width: 600px;
+	background: lightcyan;
+	border-left: 1px solid red;
+	border-right: 1px solid yellow;
+}
+
+.chatapp > .screen{
+	display: none;
+}
+
+.chatapp > .screen.active{
+	display: block;
+	width: 100%;
+	height: 70%;
+}
+
+.screen .join{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 80%;
+	max-width: 400px;
+}
+
+.screen .join-input{
+	width: 100%;
+	margin: 20px 0px;
+}
+
+.screen h2 {
+	margin-bottom: 20px;
+	font-size: 30px;
+	color: purple;
+	border-bottom: 4px solid green;
+	padding: 5px 0px;
+	display: inline-block;
+}
+
+.screen .join-input label{
+	display: block;
+	margin-bottom: 5px;
+}
+
+.screen .join-input input{
+	width: 100%;
+	padding: 10px;
+	border: 1px solid blue;
+	font-size: 16px;
+}
+
+.screen .join-input select{
+	width: 10%;
+	padding: 10px;
+	border: 1px solid blue;
+	font-size: 16px;
+}
+
+/*JOIN CHAT BUTTON*/
+.screen .join-input button{
+	padding: 10px 20px;
+	background: orange;
+	color: purple;
+	font-size: 16px;
+	cursor: pointer;
+	outline: none;
+	border: none;
+}
+
+/*LOGO AND LEAVE BUTTON*/
+.chat-screen .header{
+	background: #110;
+	height: 50px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0px 20px;
+}
+
+/*CHAT ROOM LOGO*/
+.chat-screen .header .logo{
+	font-size: 18px;
+	color: skyblue;
+	font-weight: 600;
+}
+
+/*LEAVE ROOM BUTTON*/
+.chat-screen .header button{
+	padding: 5px 10px;
+	border: 1px solid orange;
+	background: transparent;
+	color: purple;
+	font-size: 15px;
+	cursor: pointer;
+	outline: none;	
+}
+
+.chat-screen .msgs{
+	width: 100%;
+	height: calc(100% - 100px);
+	background: floralwhite;
+	overflow: auto;
+}
+
+.chat-screen .msgs .msg{
+	display: flex;
+	padding: 10px;
+}
+
+/*DISPLAY MESAGE BACKGROUND COLOR*/
+.chat-screen .msgs .msg > div{
+	max-width: 80%;	
+	background: #f5f5f5;
+	box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.05);
+	padding: 10px;
+}
+
+/*USER MESSAGE POSTION*/
+.chat-screen .msgs .msg.my-msg{
+	justify-content: flex-end;
+}
+
+/*OTHER MEMEBER MESSAGE POSITION*/
+.chat-screen .msgs .msg.other-msg{
+	justify-content: flex-start;
+}
+
+/*NAME*/
+.chat-screen .msgs .msg .user-name{
+	font-size: 13px;
+	color: blue;
+	margin-bottom: 5px;
+}
+
+.chat-screen .msgs .msg .text{
+	word-wrap: break-word;
+}
+
+/*JOIN/LEAVE USER MESSAGE*/
+.chat-screen .msgs .update{
+	text-align: center;
+	padding: 20px;
+	font-style: italic;
+}
+
+.chat-screen .textBox{
+	width: 100%;
+	height: 50px;
+	display: flex;
+}
+
+.chat-screen .textBox input{
+	flex: 1;
+	height: 50px;
+	font-size: 18px;
+}
+
+.chat-screen .textBox button{
+	width: 80px;
+	height: 100%;
+	background: honeydew;
+	color: purple;
+	font-size: 16px;
+	outline: none;
+	border: none;
+	cursor: pointer;
+}
