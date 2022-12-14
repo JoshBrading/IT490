@@ -74,3 +74,35 @@ echo "VHOST = '$VHOST'" >> config.py
 echo "EXCHANGE = '$EXCHANGE'" >> config.py
 echo "QUEUE = '$QUEUE'" >> config.py
 echo "AUTO_DELETE = 'true'" >> config.py
+
+# Setup the systemd service and timer.
+
+cat <<EOT > /etc/systemd/system/quizapi.service
+[Unit]
+Description=My quizapi
+
+[Service]
+Type=simple
+ExecStart=$parent_dir/venv/bin/python3 $parent_dir/app.py
+
+[Install]
+WantedBy=multi-user.target
+EOT
+
+# Create the systemd timer unit file.
+cat <<EOT > /etc/systemd/system/quizapi.timer
+[Unit]
+Description=Run My quizapi every 24 hours
+
+[Timer]
+OnCalendar=*-*-* 00:00:00
+
+[Install]
+WantedBy=timers.target
+EOT
+
+# Enable and start the service and timer.
+systemctl enable quizapi.service
+systemctl start quizapi.service
+systemctl enable quizapi.timer
+systemctl start quizapi.timer
