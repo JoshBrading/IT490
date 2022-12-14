@@ -1,61 +1,43 @@
-echo Checking if Python is installed...
-missing_py = setup.sh line 3: python: command not found
-result=$(python3 --version)
+#!/bin/bash
 
-if [[ $result -ge missing_py ]]
-then
-    echo Python is not installed
-    echo Installing Python...
+# Check if python3 is installed.
+if command -v python3 >/dev/null; then
+    echo "Python is installed"
+else
+    echo "Python is not installed"
+    echo "Installing Python..."
     sudo apt-update
     sudo apt-get install python3
-    echo Python installed
-else
-    echo Python is installed
+    echo "Python installed"
 fi
 
-echo Checking if pip is installed...
-missing_pip = setup.sh line 9: pip: command not found
-result=$(pip3 --version)
-if [[ $result -ge missing_pip ]]
-then
-    echo pip is not installed
-    echo Installing pip...
+# Check if pip3 is installed.
+if command -v pip3 >/dev/null; then
+    echo "pip is installed"
+else
+    echo "pip is not installed"
+    echo "Installing pip..."
     sudo apt-get install python3-pip
-    echo pip installed
-else
-    echo pip is installed
+    echo "pip installed"
 fi
 
-echo Checking if virtualenv is installed...
-missing_venv = setup.sh line 15: virtualenv: command not found
-result=$(virtualenv --version)
-if [[ $result -ge missing_venv ]]
-then
-    echo virtualenv is not installed
-    echo Installing virtualenv...
+# Check if virtualenv is installed.
+if command -v virtualenv >/dev/null; then
+    echo "virtualenv is installed"
+else
+    echo "virtualenv is not installed"
+    echo "Installing virtualenv..."
     sudo apt-get install virtualenv
-    echo virtualenv installed
-else
-    echo virtualenv is installed
+    echo "virtualenv installed"
 fi
 
-echo Setting up virtualenv
+# Setup a virtual environment for python.
 virtualenv venv
-echo Activating virtualenv
-source venv/bin/activate
 
-echo Installing requirements.txt
-pip3 install -r requirements.txt
+# Activate the virtual environment.
+source /path/to/venv/bin/activate
 
-echo Generating config.py
-echo BROKER_HOST = "" > config.py
-echo BROKER_PORT = "" >> config.py
-echo USER = "" >> config.py
-echo PASSWORD = "" >> config.py
-echo VHOST = "" >> config.py
-echo EXCHANGE = "" >> config.py
-echo QUEUE = "" >> config.py
-echo AUTO_DELETE = "true" >> config.py
+# Install the python requirements.
+pip3 install -r /path/to/requirements.txt
 
-
-echo Done!
+# Generate the config.py file.
