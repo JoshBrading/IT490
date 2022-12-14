@@ -47,14 +47,30 @@ virtualenv "$venv_path"
 source "$venv_path/bin/activate"
 
 # Install the python requirements.
-pip3 install -r /path/to/requirements.txt
+pip3 install -r "$parent_dir"/requirements.txt
+
+# Prompt the user for the config.py parameters.
+echo "Enter the BROKER_HOST: "
+read BROKER_HOST
+echo "Enter the BROKER_PORT: "
+read BROKER_PORT
+echo "Enter the USER: "
+read USER
+echo "Enter the PASSWORD: "
+read PASSWORD
+echo "Enter the VHOST: "
+read VHOST
+echo "Enter the EXCHANGE: "
+read EXCHANGE
+echo "Enter the QUEUE: "
+read QUEUE
 
 # Generate the config.py file.
-echo "BROKER_HOST = ''" > config.py
-echo "BROKER_PORT = ''" >> config.py
-echo "USER = ''" >> config.py
-echo "PASSWORD = ''" >> config.py
-echo "VHOST = ''" >> config.py
-echo "EXCHANGE = ''" >> config.py
-echo "QUEUE = ''" >> config.py
+echo "BROKER_HOST = '$BROKER_HOST'" > config.py
+echo "BROKER_PORT = '$BROKER_PORT'" >> config.py
+echo "USER = '$USER'" >> config.py
+echo "PASSWORD = '$PASSWORD'" >> config.py
+echo "VHOST = '$VHOST'" >> config.py
+echo "EXCHANGE = '$EXCHANGE'" >> config.py
+echo "QUEUE = '$QUEUE'" >> config.py
 echo "AUTO_DELETE = 'true'" >> config.py
