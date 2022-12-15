@@ -79,20 +79,21 @@ echo "AUTO_DELETE = 'true'" >> config.py
 
 cat <<EOT > /etc/systemd/system/quizapi.service
 [Unit]
-Description=My quizapi
+Description=Poll Steam API for game data
 
 [Service]
 Type=simple
-ExecStart=$parent_dir/venv/bin/python3 $parent_dir/app.py
+ExecStart=$cwd/venv/bin/python3 $cwd/app.py
 
 [Install]
 WantedBy=multi-user.target
 EOT
 
+
 # Create the systemd timer unit file.
 cat <<EOT > /etc/systemd/system/quizapi.timer
 [Unit]
-Description=Run My quizapi every 24 hours
+Description=Run quizapi every 24 hours
 
 [Timer]
 OnCalendar=*-*-* 00:00:00
