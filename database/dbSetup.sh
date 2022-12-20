@@ -65,19 +65,19 @@ mysql -uroot -p${rootpasswd} << EOF
     PRIMARY KEY (lobbyID)
   );
 
-  CREATE TABLE `gamePacks` (
-  `username` varchar(25) NOT NULL,
-  `packName` varchar(25) NOT NULL,
-  `appID` int NOT NULL,
-  `gameName` varchar(200) DEFAULT NULL,
-  PRIMARY KEY (`username`,`packName`,`appID`)
+  CREATE TABLE gamePacks (
+  username varchar(25) NOT NULL,
+  packName varcar(25) NOT NULL,
+  appID int NOT NULL,
+  gameName varchar(200) DEFAULT NULL,
+  PRIMARY KEY (username,packName,appID)
   );
 
-  CREATE TABLE `importedGames` (
-    `username` varchar(25) NOT NULL,
-    `appID` int NOT NULL,
-    `gameName` varchar(200) DEFAULT NULL,
-    PRIMARY KEY (`username`,`appID`)
+  CREATE TABLE importedGames (
+    username varchar(25) NOT NULL,
+    appID int NOT NULL,
+    gameName varchar(200) DEFAULT NULL,
+    PRIMARY KEY (username,appID)
   );
 
   FLUSH PRIVILEGES;
