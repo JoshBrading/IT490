@@ -22,6 +22,47 @@ function logMsg($msg)
   file_put_contents("log.log", date("Y-m-d H:i:s")." ".$msg.PHP_EOL, FILE_APPEND);
 }
 
+function getGamePacks($username, $packName)
+{
+  global $db;
+  $query = "SELECT appID, gameName FROM gamePacks WHERE username=" . $username . " AND packName=". $packName .";";
+
+  $response = $db->query($query);
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+  while ($row = $response->fetch_assoc())
+  {
+    $returnArray[] = ["app_id" => $row['appID'], "game_name" => $row['gameName']];
+  }
+  echo $returnArray;
+  return $returnArray;
+}
+
+function getImportedGames($username)
+{
+  global $db;
+  $query = "SELECT appID, gameName FROM importedGames WHERE username=" . $username . ";";
+
+  $response = $db->query($query);
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+  while ($row = $response->fetch_assoc())
+  {
+    $returnArray[] = ["app_id" => $row['appID'], "game_name" => $row['gameName']];
+  }
+  echo $returnArray;
+  return $returnArray;
+}
+
+
 function getFriends($user_id)
 {
   global $db;
@@ -597,6 +638,12 @@ function requestProcessor($request)
       break;
     case "update_stats":
       return updateStats($request['user_id'], $request['win'], $request['points']);
+      break;
+    case "get_game_packs":
+      return getGamePacks($request['username'], $request['pack_name']);
+      break;
+    case "get_imported_games":
+      return getImportedGames($request['username']);
       break;
   }
   return array("returnCode" => '0', 'message'=>"Server received request and processed, no type matched");
