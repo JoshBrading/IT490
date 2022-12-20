@@ -1,61 +1,109 @@
-echo Checking if Python is installed...
-missing_py = setup.sh line 3: python: command not found
-result=$(python3 --version)
+#!/bin/bash
 
-if [[ $result -ge missing_py ]]
-then
-    echo Python is not installed
-    echo Installing Python...
+# Get the current working directory.
+cwd=$(pwd)
+
+# Get the parent directory of the script.
+parent_dir=$(dirname "$0")
+
+# Construct the path to the virtual environment.
+venv_path="$parent_dir/venv"
+
+# Check if python3 is installed.
+if command -v python3 >/dev/null; then
+    echo "Python is installed"
+else
+    echo "Python is not installed"
+    echo "Installing Python..."
     sudo apt-update
-    sudo apt-get install python3
-    echo Python installed
-else
-    echo Python is installed
+    sudo apt-get install -y python3
+    echo "Python installed"
 fi
 
-echo Checking if pip is installed...
-missing_pip = setup.sh line 9: pip: command not found
-result=$(pip3 --version)
-if [[ $result -ge missing_pip ]]
-then
-    echo pip is not installed
-    echo Installing pip...
-    sudo apt-get install python3-pip
-    echo pip installed
+# Check if pip3 is installed.
+if command -v pip3 >/dev/null; then
+    echo "pip is installed"
 else
-    echo pip is installed
+    echo "pip is not installed"
+    echo "Installing pip..."
+    sudo apt-get install -y python3-pip
+    echo "pip installed"
 fi
 
-echo Checking if virtualenv is installed...
-missing_venv = setup.sh line 15: virtualenv: command not found
-result=$(virtualenv --version)
-if [[ $result -ge missing_venv ]]
-then
-    echo virtualenv is not installed
-    echo Installing virtualenv...
-    sudo apt-get install virtualenv
-    echo virtualenv installed
+# Check if virtualenv is installed.
+if command -v virtualenv >/dev/null; then
+    echo "virtualenv is installed"
 else
-    echo virtualenv is installed
+    echo "virtualenv is not installed"
+    echo "Installing virtualenv..."
+    sudo apt-get install -y virtualenv
+    echo "virtualenv installed"
 fi
 
-echo Setting up virtualenv
-virtualenv venv
-echo Activating virtualenv
-source venv/bin/activate
+# Setup a virtual environment for python.
+virtualenv "$venv_path"
 
-echo Installing requirements.txt
-pip3 install -r requirements.txt
+# Activate the virtual environment.
+source "$venv_path/bin/activate"
 
-echo Generating config.py
-echo BROKER_HOST = "" > config.py
-echo BROKER_PORT = "" >> config.py
-echo USER = "" >> config.py
-echo PASSWORD = "" >> config.py
-echo VHOST = "" >> config.py
-echo EXCHANGE = "" >> config.py
-echo QUEUE = "" >> config.py
-echo AUTO_DELETE = "true" >> config.py
+# Install the python requirements.
+pip3 install -r "$parent_dir"/requirements.txt
+
+# Prompt the user for the config.py parameters.
+echo "Enter the BROKER_HOST: "
+read BROKER_HOST
+echo "Enter the BROKER_PORT: "
+read BROKER_PORT
+echo "Enter the USER: "
+read USER
+echo "Enter the PASSWORD: "
+read PASSWORD
+echo "Enter the VHOST: "
+read VHOST
+echo "Enter the EXCHANGE: "
+read EXCHANGE
+echo "Enter the QUEUE: "
+read QUEUE
+
+# Generate the config.py file.
+echo "BROKER_HOST = '$BROKER_HOST'" > config.py
+echo "BROKER_PORT = '$BROKER_PORT'" >> config.py
+echo "USER = '$USER'" >> config.py
+echo "PASSWORD = '$PASSWORD'" >> config.py
+echo "VHOST = '$VHOST'" >> config.py
+echo "EXCHANGE = '$EXCHANGE'" >> config.py
+echo "QUEUE = '$QUEUE'" >> config.py
+echo "AUTO_DELETE = 'true'" >> config.py
+
+# Setup the systemd service and timer.
+
+cat <<EOT > /etc/systemd/system/quizapi.service
+[Unit]
+Description=Poll Steam API for game data
+
+[Service]
+Type=simple
+ExecStart=$cwd/venv/bin/python3 $cwd/app.py
+
+[Install]
+WantedBy=multi-user.target
+EOT
 
 
-echo Done!
+# Create the systemd timer unit file.
+cat <<EOT > /etc/systemd/system/quizapi.timer
+[Unit]
+Description=Run quizapi every 24 hours
+
+[Timer]
+OnCalendar=*-*-* 00:00:00
+
+[Install]
+WantedBy=timers.target
+EOT
+
+# Enable and start the service and timer.
+systemctl enable quizapi.service
+systemctl start quizapi.service
+systemctl enable quizapi.timer
+systemctl start quizapi.timer
