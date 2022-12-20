@@ -1,0 +1,54 @@
+@import url("https://use.typekit.net/nlr3sbf.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.sidebar-item {
+    padding: 1;
+    display: block;
+    margin-left: 3px;
+    margin-top: 8px;
+}
+
+.sidebar-item:hover {
+    background-color: black;
+}
+
+.sidebar-title {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-family: input-mono, monospace;
+    font-weight: 200;
+    font-size: 16px;
+    color: white;
+}
+
+.sidebar-item .toggle {
+    cursor: pointer;
+}
+
+.sidebar-content{
+    flex-direction: column;
+    padding-left: 48px;
+    height: 0px;
+    overflow: hidden;
+}
+
+.sidebar-item.open .toggle-icon {
+    transition: transform 0.1s ease-in-out;
+    transform: rotate(90deg);
+}
+
+.sidebar-item .toggle-icon {
+    transition: transform 0.1s ease-in-out;
+    transform: rotate(0deg);
+}
+
+.sidebar-item.open .sidebar-content {
+    transition: height 0.2s ease-in-out;
+    height: auto;
+}
