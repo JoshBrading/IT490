@@ -126,6 +126,7 @@ export const RabbitTypes = {
     new_steam_game: "new_steam_game",
     get_steam_game: "get_steam_game",
     get_all_steam_games: "get_all_steam_games",
+    get_steam_game_short: "get_steam_game_short",
   },
   lobby: {
     lobby_add: "lobby_add",
@@ -138,6 +139,6 @@ export const RabbitTypes = {
 
  export const Rabbit = new RabbitMQClient();
 
-//  await Rabbit.sendRequest({ type: 'ping'}).then((response) => {
-//    console.log(response);
-//  });
+await Rabbit.sendRequest({ type: 'ping'}).then((response) => {
+  console.log(response);
+});

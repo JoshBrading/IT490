@@ -17,24 +17,12 @@ const FriendForm = () => {
 
   return (
     <div className="w-32 flex flex-col">
-      <label for="uname">
-        <b>Add Friend</b>
-      </label>
-      <input
-        className="bg-gray-300"
-        type="text"
-        id="uname"
-        name="uname"
-        placeholder="Username"
-        onChange={(event) => {
-          setUser({ ...user, username: event.target.value });
-        }}
-      />
+      <label ><b>Add Friend</b></label>
+      <input className="bg-gray-300" type="text" id="uname" name="uname" placeholder="Username" onChange={(event) => {setUser({ ...user, username: event.target.value });}}/>
       <button
         onClick={sendFriendReq}
         className="my-1 bg-blue-400 hover:bg-blue-700 text-white py-0.5 px-2 rounded"
-        type="submit"
-      >
+        type="submit">
         Add Friend
       </button>
     </div>

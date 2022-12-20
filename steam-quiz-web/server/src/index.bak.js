@@ -7,7 +7,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 //import "./game.js";
-import "./hangman.js";
 import { Rabbit, RabbitTypes } from "./rabbit.js";
 
 var SteamStrategy = passprtSteam.Strategy;
@@ -153,8 +152,7 @@ app.get("/game", async (req, res) => {
 
 app.post("/api/userRequest", async (req, res) => {
   const { request, username } = req.body;
-  console.log(req.body);
-  console.log(request, RabbitTypes.user.get_game_packs);
+  //console.log(request, RabbitTypes.user.get_game_packs);
   switch (request) {
     case RabbitTypes.user.get_user_data:
       res.json({
@@ -216,9 +214,8 @@ app.post("/api/userRequest", async (req, res) => {
     case RabbitTypes.user.get_game_packs:
       Rabbit.sendRequest({ type: RabbitTypes.user.get_game_packs, username: username }).then(
         (response) => {
-          console.log(response);
-          console.log(JSON.parse(response));
-          res.json({ success: true, packs: JSON.parse(response) });
+          console.log(response)
+          res.json({ success: true, packs: response });
         }
       );
       break;

@@ -1,22 +1,20 @@
 import React from "react";
-import { types as Rabbit } from "../util/rabbit";
-import axios from "axios";
+import {types as Rabbit} from "../util/rabbit";
+import Axios from "axios";
 
 const GamePacks = ({username}) => {
-  const [game_packs, setGamePacks] = React.useState([]);
+  const [gamePacks, setGamePacks] = React.useState([]);
 
   React.useEffect(() => {
     async function fetchData() {
-      const data = {
-        request: Rabbit.user.get_game_packs,
-        username: username,
-      };
-
-      const response = await axios.post(
+      const response = await Axios.post(
         "http://localhost:3001/api/userRequest",
-        data
+        { request: Rabbit.user.get_game_packs, username }
       );
-      setGamePacks(response.data["packs"]);
+      console.log(response.data);
+      if (response.data["success"]) {
+        setGamePacks(response.data["packs"]);
+      }
     }
 
     fetchData();
@@ -26,12 +24,12 @@ const GamePacks = ({username}) => {
     <div>
       <b>{username}'s Game Packs</b>
       <ul>
-        {game_packs.map((game_pack) => (
-          <li key={game_pack}>{game_pack}</li>
+        {gamePacks.map((gamePack) => (
+          <li key={gamePack}>{gamePack}</li>
         ))}
       </ul>
     </div>
   );
-}
+};
 
 export default GamePacks;
