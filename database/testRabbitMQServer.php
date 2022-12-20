@@ -90,24 +90,30 @@ function addImportedGame($username, $appID, $gameName)
   return json_encode(["status" => "success"]);
 }
 
-function getGamePacks($username, $packName)
+function getGamePacks($username)
 {
   global $db;
-  $query = "SELECT appID, gameName FROM gamePacks WHERE username=" . $username . " AND packName=". $packName .";";
+  $query = "SELECT DISTINCT packName FROM gamePacks WHERE username = ?";
 
-  $response = $db->query($query);
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, "s", $username);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+
   if ($db->errno != 0)
   {
     echo "failed to execute query:".PHP_EOL;
     echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
     exit(0);
   }
-  while ($row = $response->fetch_assoc())
+
+  $gamePacks = [];
+  while ($row = mysqli_fetch_assoc($result))
   {
-    $returnArray[] = ["app_id" => $row['appID'], "game_name" => $row['gameName']];
+    $gamePacks[] = $row["packName"];
   }
-  echo $returnArray;
-  return $returnArray;
+
+  return json_encode($gamePacks);
 }
 
 function getImportedGames($username)
@@ -708,7 +714,7 @@ function requestProcessor($request)
       return updateStats($request['user_id'], $request['win'], $request['points']);
       break;
     case "get_game_packs":
-      return getGamePacks($request['username'], $request['pack_name']);
+      return getGamePacks($request['username']);
       break;
     case "get_imported_games":
       return getImportedGames($request['username']);
