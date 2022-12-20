@@ -7,6 +7,7 @@ import Home from "./views/Home";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Profile from "./views/Profile";
 import NoMatch from "./views/NoMatch";
+import Launchpad from "./views/Launchpad";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home/>} />
+          <Route path="/lobbies" element={<Launchpad/>}/>
           <Route path="/register" element={<Register/>} />
           <Route path="/user/:user/" element={<Profile/>} />
           <Route path="/game" element={<Game />} />

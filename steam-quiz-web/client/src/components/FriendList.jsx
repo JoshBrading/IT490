@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import React from "react";
 import { types as Rabbit } from "../util/rabbit";
 import axios from "axios";
 
-function FriendList({ username }) {
-  const [friends, setFriends] = useState([]);
+const FriendList = ({username}) => {
+  const [friends, setFriends] = React.useState([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     async function fetchData() {
       const data = {
         request: Rabbit.user.get_friends,
