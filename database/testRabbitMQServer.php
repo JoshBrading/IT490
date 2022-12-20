@@ -714,10 +714,10 @@ function requestProcessor($request)
       return getImportedGames($request['username']);
       break;
     case "add_game_pack":
-      addGamePack($request['username'], $request['name'], $request['id'], $request['game_name']);
+      return addGamePack($request['username'], $request['name'], $request['id'], $request['game_name']);
       break;
     case "add_imported_game":
-      addImportedGame($request['username'], $request['id'], $request['game_name']);
+      return addImportedGame($request['username'], $request['id'], $request['game_name']);
       break;
     case "get_game_pack":
       return getGamePack($request['username'], $request['pack_name']);
