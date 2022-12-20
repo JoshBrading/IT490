@@ -22,6 +22,74 @@ function logMsg($msg)
   file_put_contents("log.log", date("Y-m-d H:i:s")." ".$msg.PHP_EOL, FILE_APPEND);
 }
 
+function getGamePack($username, $packName)
+{
+  global $db;
+  $query = "SELECT appID, gameName FROM gamePacks WHERE username = ? AND packName = ?";
+
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, "ss", $username, $packName);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+
+  $games = [];
+  while ($row = mysqli_fetch_assoc($result))
+  {
+    $games[] = $row;
+  }
+
+  return json_encode($games);
+}
+
+
+function addGamePack($username, $packName, $appID, $gameName)
+{
+  global $db;
+  $query = "INSERT INTO gamePacks (username, packName, appID, gameName) VALUES (?, ?, ?, ?)";
+
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, "ssis", $username, $packName, $appID, $gameName);
+  mysqli_stmt_execute($stmt);
+
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+
+  echo json_encode(["status" => "success"]) . PHP_EOL;
+  return json_encode(["status" => "success"]);
+}
+
+
+function addImportedGame($username, $appID, $gameName)
+{
+  global $db;
+  $query = "INSERT INTO importedGames (username, appID, gameName) VALUES (?, ?, ?)";
+
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, "sis", $username, $appID, $gameName);
+  mysqli_stmt_execute($stmt);
+
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+
+  echo json_encode(["status" => "success"]) . PHP_EOL;
+  return json_encode(["status" => "success"]);
+}
+
 function getGamePacks($username, $packName)
 {
   global $db;
@@ -644,6 +712,15 @@ function requestProcessor($request)
       break;
     case "get_imported_games":
       return getImportedGames($request['username']);
+      break;
+    case "add_game_pack":
+      addGamePack($request['username'], $request['name'], $request['id'], $request['game_name']);
+      break;
+    case "add_imported_game":
+      addImportedGame($request['username'], $request['id'], $request['game_name']);
+      break;
+    case "get_game_pack":
+      return getGamePack($request['username'], $request['pack_name']);
       break;
   }
   return array("returnCode" => '0', 'message'=>"Server received request and processed, no type matched");
