@@ -619,7 +619,7 @@ function getAllSteamGames()
   }
   $stuffToReturn = mysqli_fetch_all($response);
   $stuffToReturn = json_encode($stuffToReturn, JSON_FORCE_OBJECT);
-  echo $stuffToReturn;
+  //echo $stuffToReturn;
   return $stuffToReturn;
 }
 //write a function that returns "pong"
