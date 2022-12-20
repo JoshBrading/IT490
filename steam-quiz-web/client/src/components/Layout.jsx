@@ -9,7 +9,7 @@ const Layout = ({ children }) => {
     <div>
       <Header setIsOpen={setIsOpen}/>
       <div className="flex">
-      <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
+      {/*<SideBar isOpen={isOpen} setIsOpen={setIsOpen} />*/}
       <main className="flex-grow">{children}</main>
       </div>
       <Footer />

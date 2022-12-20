@@ -1,18 +1,57 @@
-import React, { useState, useEffect, useRef } from 'react';
-import io from 'socket.io-client';
+import React, { useState, useEffect, useRef } from "react";
+import { types as Rabbit } from "../util/rabbit";
+import Axios from "axios";
+import io from "socket.io-client";
 
-const socket = io('http://localhost:5000');
+import Select, { components } from "react-select";
+import makeAnimated from "react-select/animated";
+
+const socket = io("http://localhost:5000");
 
 const Hangman = () => {
-  const [game, setGame] = useState({});
-  const [roundOver, setRoundOver] = useState(false);  // added
-  const [guess, setGuess] = useState('');
+  const [gamePacks, setGamePacks] = React.useState([]);
+  const [selectedGamePacks, setSelectedGamePacks] = React.useState([]);
+  const [roundOver, setRoundOver] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [guess, setGuess] = useState("");
+  const [showGame, setShowGame] = useState(false); // added
+  const [game, setGame] = useState({
+    word: "",
+    letters: [],
+    incorrectGuesses: 0,
+    correctGuesses: 0,
+    gameOver: false,
+    winner: false,
+    played: 0,
+    wins: 0,
+    losses: 0,
+  });
 
   useEffect(() => {
-    
-    socket.on('game-state', data => {
+    async function fetchGamePacks() {
+      const res = await Axios.post("http://localhost:3001/api/userRequest", {
+        request: "get_game_packs",
+        username: window.localStorage.getItem("username"),
+      });
+      if (res.data["success"] == true) {
+        setGamePacks(
+          res.data["packs"].map((pack, i) => ({ label: pack, value: i }))
+        );
+      }
+    }
+    fetchGamePacks();
+  }, []);
+
+  const handleGameList = (game) => {
+    setSelectedGamePacks(game);
+    console.log(selectedGamePacks);
+  };
+
+  useEffect(() => {
+    socket.on("game-state", (data) => {
       setGame(data);
-      setRoundOver(data.gameOver || data.winner || data.incorrectGuesses === 5);  // modified
+      setRoundOver(data.gameOver || data.winner || data.incorrectGuesses === 5);
+      setGameOver(data.gameOver); // modified
     });
 
     return () => {
@@ -20,57 +59,87 @@ const Hangman = () => {
     };
   }, []);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     setGuess(e.target.value);
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     // Send the guess to the server
-    socket.emit('guess', guess);
+    socket.emit("guess", guess);
+    console.log(game.incorrectGuesses);
     // Clear the input field
-    setGuess('');
+    setGuess("");
   };
 
   return (
     <div>
       <h1>Hangman</h1>
-      {roundOver ? (
-        game.winner ? (
-          <p>You win!</p>
-        ) : (
-          <p>You lose!</p>
-        )
-      ) : game.letters ? (
-        <>
-          <p>Incorrect guesses: {game.incorrectGuesses}</p>
-          <p>
-            {game.letters.map((letter, i) => (
-              <span key={i}>{letter}</span>
-            ))}
-          </p>
-          {!roundOver && (  // added
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                value={guess}
-                onChange={handleChange}
-                maxLength={1}
-              />
-              <button type="submit">Guess</button>
-            </form>
-          )}
-        </>
+      {!showGame ? (
+        <div className="w-64">
+          <button
+            onClick={() => {
+                setShowGame(true);
+                socket.emit("new-game", selectedGamePacks);
+            }}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Start Game
+          </button>
+          <Select
+            onChange={handleGameList}
+            closeMenuOnSelect={false}
+            components={makeAnimated()}
+            isMulti="isMulti"
+            options={gamePacks}
+          />
+        </div>
       ) : (
-        <p>Loading...</p>
+        <div>
+          {roundOver ? (
+            game.winner ? (
+              <p>
+                You won! You have {game.wins}
+                wins and {game.losses}
+                losses.
+              </p>
+            ) : (
+              <p>
+                You lost. You have {game.wins}
+                wins and {game.losses}
+                losses.
+              </p>
+            )
+          ) : roundOver ? (
+            <div>
+              <p>Round over!</p>
+              <button
+                onClick={() => {
+                  setRoundOver(false);
+                  setGameOver(false);
+                  socket.emit("new-game");
+                }}
+              >
+                Play again
+              </button>
+            </div>
+          ) : (
+            <div>
+              <p>{game.letters.join(" ")}</p>
+              <p>Incorrect Guesses: {game.incorrectGuesses}/5</p>
+              <form onSubmit={handleSubmit}>
+                <label>
+                  Guess a letter:
+                  <input type="text" value={guess} onChange={handleChange} />
+                </label>
+                <button type="submit">Guess</button>
+              </form>
+            </div>
+          )}
+        </div>
       )}
-      <p>
-        Rounds played: {game.played} ({game.wins} wins, {game.losses} losses)
-      </p>
     </div>
-    
-    );
+  );
 };
 
 export default Hangman;
- 
