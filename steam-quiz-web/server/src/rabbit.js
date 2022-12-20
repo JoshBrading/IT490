@@ -113,7 +113,7 @@ export const RabbitTypes = {
     get_account_id: "get_account_id",
     add_friend: "add_friend",
     add_acheivement: "add_achievement",
-    get_acheivements: "get_acheivements",
+    get_acheivements: "get_achievements",
     user_update_achievements_public: "user_update_achievements_public",
     user_update_friends_public: "user_update_friends_public",
     user_update_profile_public: "user_update_profile_public",
@@ -138,6 +138,6 @@ export const RabbitTypes = {
 
  export const Rabbit = new RabbitMQClient();
 
- await Rabbit.sendRequest({ type: 'ping'}).then((response) => {
-   console.log(response);
- });
+//  await Rabbit.sendRequest({ type: 'ping'}).then((response) => {
+//    console.log(response);
+//  });

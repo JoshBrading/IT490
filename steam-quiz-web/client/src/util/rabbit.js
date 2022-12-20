@@ -11,7 +11,11 @@ export const types = {
       get_acheivements: "get_acheivements",
       user_update_achievements_public: "user_update_achievements_public",
       user_update_friends_public: "user_update_friends_public",
-      user_update_profile_public: "user_update_profile_public"
+      user_update_profile_public: "user_update_profile_public",
+      add_steam_games: "add_steam_games",
+      add_game_pack: "add_game_pack",
+      get_game_pack: "get_game_pack",
+      get_game_packs: "get_game_packs",
     },
     game: {
       new_steam_game: "new_steam_game",
