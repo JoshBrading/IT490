@@ -1,6 +1,8 @@
 #!/usr/bin/php
 
 <?php
+logMsg("started testRabbitMQServer");
+error_log(date("Y-m-d H:i:s"));
 $dbVars = parse_ini_file('database.ini');
 $dbIP = $dbVars['dbIP'];
 $dbUser = $dbVars['dbUser'];
@@ -14,6 +16,126 @@ if ($db->errno != 0)
   exit(0);
 }
 echo "successfully connected to database".PHP_EOL;
+
+function logMsg($msg)
+{
+  file_put_contents("log.log", date("Y-m-d H:i:s")." ".$msg.PHP_EOL, FILE_APPEND);
+}
+
+function getGamePack($username, $packName)
+{
+  global $db;
+  $query = "SELECT appID, gameName FROM gamePacks WHERE username = ? AND packName = ?";
+
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, "ss", $username, $packName);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+
+  $games = [];
+  while ($row = mysqli_fetch_assoc($result))
+  {
+    $games[] = $row;
+  }
+
+  return json_encode($games);
+}
+
+
+function addGamePack($username, $packName, $appID, $gameName)
+{
+  global $db;
+  $query = "INSERT INTO gamePacks (username, packName, appID, gameName) VALUES (?, ?, ?, ?)";
+
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, "ssis", $username, $packName, $appID, $gameName);
+  mysqli_stmt_execute($stmt);
+
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+
+  echo json_encode(["status" => "success"]) . PHP_EOL;
+  return json_encode(["status" => "success"]);
+}
+
+
+function addImportedGame($username, $appID, $gameName)
+{
+  global $db;
+  $query = "INSERT INTO importedGames (username, appID, gameName) VALUES (?, ?, ?)";
+
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, "sis", $username, $appID, $gameName);
+  mysqli_stmt_execute($stmt);
+
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+
+  echo json_encode(["status" => "success"]) . PHP_EOL;
+  return json_encode(["status" => "success"]);
+}
+
+function getGamePacks($username)
+{
+  global $db;
+  $query = "SELECT DISTINCT packName FROM gamePacks WHERE username = ?";
+
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, "s", $username);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+
+  $gamePacks = [];
+  while ($row = mysqli_fetch_assoc($result))
+  {
+    $gamePacks[] = $row["packName"];
+  }
+
+  return json_encode($gamePacks);
+}
+
+function getImportedGames($username)
+{
+  global $db;
+  $query = "SELECT appID, gameName FROM importedGames WHERE username=" . $username . ";";
+
+  $response = $db->query($query);
+  if ($db->errno != 0)
+  {
+    echo "failed to execute query:".PHP_EOL;
+    echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
+    exit(0);
+  }
+  while ($row = $response->fetch_assoc())
+  {
+    $returnArray[] = ["app_id" => $row['appID'], "game_name" => $row['gameName']];
+  }
+  echo $returnArray;
+  return $returnArray;
+}
+
 
 function getFriends($user_id)
 {
@@ -32,7 +154,7 @@ function getFriends($user_id)
     $returnArray[] = ["friend_username" => $row['friendUsername'], "friend_id" => $row['friendID']];
   }
   echo json_encode($returnArray);
-  return json_encode($returnArray);
+  return $returnArray;
 }
 
 function getAchievements($user_id)
@@ -260,7 +382,7 @@ function addAchievement($user_id, $achievement)
     echo __FILE__.':'.__LINE__.":error: ".$db->error.PHP_EOL;
     exit(0);
   }
-
+  logMsg("Achievement added for user with the ID " . $user_id . ": " . $achievement);
   return "Achievement Added";
 }
 
@@ -420,7 +542,7 @@ function doLogin($username)
     $response = $response->fetch_assoc();
     $response =["hash" => $response["password"], "id" => $response["accID"]];
     echo json_encode($response);
-    return json_encode($response);
+    return $response;
 
     
     //return false if not valid
@@ -497,21 +619,34 @@ function getAllSteamGames()
   }
   $stuffToReturn = mysqli_fetch_all($response);
   $stuffToReturn = json_encode($stuffToReturn, JSON_FORCE_OBJECT);
-  echo $stuffToReturn;
+  //echo $stuffToReturn;
   return $stuffToReturn;
 }
-
+//write a function that returns "pong"
+function doPing()
+{
+  echo("pong".PHP_EOL);
+  return json_encode("pong");
+}
 function requestProcessor($request)
 {
 
   echo "received request".PHP_EOL;
-  var_dump($request);
+  //$request = json_decode($request);
+  var_dump($request, true);
   if(!isset($request['type']))
   {
+    logMsg("ERROR: unsupported message type");
     return "ERROR: unsupported message type";
   }
+  logMsg("received request from client with request type: ".$request['type']);
+  echo ("received request from client with request type: ".$request['type'].PHP_EOL);
+  echo ($request . PHP_EOL);
   switch ($request['type'])
   {
+    case "ping":
+      return doPing();
+      break;
     case "login":
       return doLogin($request['username']);
       break;
@@ -578,8 +713,24 @@ function requestProcessor($request)
     case "update_stats":
       return updateStats($request['user_id'], $request['win'], $request['points']);
       break;
+    case "get_game_packs":
+      return getGamePacks($request['username']);
+      break;
+    case "get_imported_games":
+      return getImportedGames($request['username']);
+      break;
+    case "add_game_pack":
+      return addGamePack($request['username'], $request['name'], $request['id'], $request['game_name']);
+      break;
+    case "add_imported_game":
+      return addImportedGame($request['username'], $request['id'], $request['game_name']);
+      break;
+    case "get_game_pack":
+      return getGamePack($request['username'], $request['pack_name']);
+      break;
   }
   return array("returnCode" => '0', 'message'=>"Server received request and processed, no type matched");
+  logMsg("No Type Matched");
 }
 
 $server = new rabbitMQServer("testRabbitMQ.ini","testServer");
